@@ -1,0 +1,26 @@
+/* assets/base-bonsignore.css */
+:root {
+  --color-primary: #2D5A27;    /* Verde Foresta */
+  --color-accent: #F37021;     /* Arancio Meccanico */
+  --color-text: #333333;       /* Grigio Ferro */
+  --color-bg-light: #F4F6F4;
+}
+
+body { color: var(--color-text); font-family: system-ui, -apple-system, sans-serif; }
+
+/* Utility Classes (Tailwind compatibili) */
+.bg-primary { background-color: var(--color-primary); color: white; }
+.bg-accent { background-color: var(--color-accent); color: white; }
+.text-primary { color: var(--color-primary); }
+.text-accent { color: var(--color-accent); }
+.text-iron { color: var(--color-text); }
+
+/* UI Components */
+.btn-massive {
+  display: flex; justify-content: center; align-items: center;
+  width: 100%; padding: 1rem; font-size: 1.125rem; font-weight: bold;
+  border-radius: 8px; text-decoration: none; transition: opacity 0.2s;
+  cursor: pointer; border: none; text-align: center;
+}
+.btn-massive:hover { opacity: 0.9; }
+.badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: bold; font-size: 0.875rem; }
