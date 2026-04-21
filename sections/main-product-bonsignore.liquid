@@ -1,0 +1,105 @@
+<div class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+  
+  <!-- Colonna Immagini (Semplificata per il prototipo) -->
+  <div class="product-media">
+    <img src="{{ product.featured_image | img_url: 'large' }}" alt="{{ product.title }}" class="w-full rounded-lg shadow-sm border border-gray-200">
+    
+    <!-- Heavy Machinery Badge Logic -->
+    {% assign product_weight_grams = product.selected_or_first_available_variant.weight %}
+    {% if product_weight_grams >= 30000 %}
+      <div class="mt-4 p-3 bg-red-100 border border-red-400 text-red-800 rounded flex items-center gap-2 font-bold">
+        <span>📦</span> Spedizione Speciale Bartolini (Peso > 30kg)
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Colonna Info Tecniche (Blocchi OS 2.0) -->
+  <div class="product-info flex flex-col gap-6">
+    
+    {%- for block in section.blocks -%}
+      {%- case block.type -%}
+        
+        {%- when 'title_and_price' -%}
+          <div {{ block.shopify_attributes }}>
+            <h1 class="text-3xl font-extrabold text-iron mb-2">{{ product.title }}</h1>
+            <div class="text-2xl font-bold text-primary">{{ product.price | money }}</div>
+          </div>
+
+        {%- when 'metafields_data' -%}
+          <div class="bg-gray-50 p-4 rounded-lg border border-gray-200" {{ block.shopify_attributes }}>
+            <h3 class="font-bold text-iron mb-2">Specifiche Tecniche</h3>
+            <ul class="text-sm space-y-1">
+              {% if product.metafields.custom.oem_code %}
+                <li><strong>Codice OEM:</strong> <span class="text-primary font-mono bg-white px-1 border">{{ product.metafields.custom.oem_code }}</span></li>
+              {% endif %}
+              {% if product.metafields.custom.compatibility_list %}
+                <li><strong>Compatibilità:</strong> {{ product.metafields.custom.compatibility_list | newline_to_br }}</li>
+              {% endif %}
+            </ul>
+          </div>
+
+        {%- when 'compatibility_bridge' -%}
+          <!-- IL PONTE DI FIDUCIA: Banner WhatsApp -->
+          <div class="bg-orange-50 border-l-4 border-accent p-4 rounded-r-lg shadow-sm my-2" {{ block.shopify_attributes }}>
+            <p class="font-bold text-iron mb-2">Dubbi sulla compatibilità col tuo mezzo?</p>
+            {% assign wa_number = block.settings.whatsapp_number %}
+            {% assign wa_text = "Ciao, vorrei sapere se il prodotto " | append: product.title | append: " (Cod:" | append: product.metafields.custom.oem_code | append: ") è compatibile con il mio mezzo." %}
+            <a 
+              href="https://wa.me/{{ wa_number }}?text={{ wa_text | url_encode }}" 
+              target="_blank"
+              class="btn-massive bg-accent text-white flex gap-2 items-center"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.487-1.761-1.663-2.06-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51h-.57c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.12.553 4.118 1.536 5.86L.026 24l6.305-1.503C8.01 23.473 9.957 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.897 0-3.69-.49-5.234-1.378l-.375-.215-3.89.927.945-3.766-.237-.384C2.33 15.545 1.8 13.826 1.8 12 1.8 6.377 6.377 1.8 12 1.8s10.2 4.577 10.2 10.2-4.577 10.2-10.2 10.2z"/></svg>
+              Verifica Compatibilità su WhatsApp
+            </a>
+          </div>
+
+        {%- when 'buy_buttons' -%}
+          <div {{ block.shopify_attributes }}>
+            {% form 'product', product, class: 'form-product' %}
+              <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+              <button type="submit" class="btn-massive bg-primary text-white mt-4">
+                Aggiungi al Carrello
+              </button>
+            {% endform %}
+          </div>
+          
+      {%- endcase -%}
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Prodotto Bonsignore",
+  "blocks":[
+    { "type": "title_and_price", "name": "Titolo e Prezzo", "limit": 1 },
+    { "type": "metafields_data", "name": "Dati OEM / Compatibilità", "limit": 1 },
+    { 
+      "type": "compatibility_bridge", 
+      "name": "Pulsante WhatsApp", 
+      "limit": 1,
+      "settings":[
+        {
+          "type": "text",
+          "id": "whatsapp_number",
+          "label": "Numero WhatsApp (Includi prefisso, es. 393331234567)",
+          "default": "390000000000"
+        }
+      ]
+    },
+    { "type": "buy_buttons", "name": "Pulsante di Acquisto", "limit": 1 }
+  ],
+  "presets":[
+    {
+      "name": "Prodotto Specialized",
+      "blocks":[
+        { "type": "title_and_price" },
+        { "type": "metafields_data" },
+        { "type": "compatibility_bridge" },
+        { "type": "buy_buttons" }
+      ]
+    }
+  ]
+}
+{% endschema %}
